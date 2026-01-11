@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Omkar Tutor</title>
+    <style>
+        /* --- LAYOUT SYSTEM (Flexbox) --- */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', 'Roboto', Helvetica, Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* Header top, Footer bottom */
+        }
+
+        /* --- TOP HEADER --- */
+        .header {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .header-logo {
+            height: 50px;
+            width: auto;
+            margin-right: 15px;
+        }
+        
+        .header-text h1 {
+            margin: 0;
+            font-size: 18px;
+            color: #2c3e50;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 800;
+        }
+        
+        .header-text p {
+            margin: 0;
+            font-size: 11px;
+            color: #7f8c8d;
+            font-weight: 600;
+        }
+
+        /* --- MAIN CONTENT (CENTERED) --- */
+        .main-container {
+            flex-grow: 1; /* Takes up all available space */
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* Vertical Center */
+            align-items: center; /* Horizontal Center */
+            padding: 20px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .cards-wrapper {
+            width: 100%;
+            max-width: 400px; /* Prevent it from getting too wide on tablets */
+        }
+
+        /* CARD STYLING */
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            transition: transform 0.1s, box-shadow 0.1s;
+            border: 3px solid transparent;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .card:active { transform: scale(0.97); }
+
+        .card-icon {
+            width: 70px;
+            height: 70px;
+            margin-right: 20px;
+            filter: drop-shadow(0 4px 4px rgba(0,0,0,0.1));
+        }
+
+        .card-info { text-align: left; }
+        .card-info h2 { margin: 0; font-size: 22px; font-weight: 700; }
+        .card-info p { margin: 5px 0 0 0; font-size: 13px; opacity: 0.8; font-weight: 600; }
+
+        /* THEMES */
+        #mrunal-btn { background: linear-gradient(135deg, #FFF0F5 0%, #FFE4E1 100%); border-color: #FFB6C1; }
+        #mrunal-btn h2 { color: #D63384; }
+        
+        #gargi-btn { background: linear-gradient(135deg, #F3F0FF 0%, #E6E6FA 100%); border-color: #9370DB; }
+        #gargi-btn h2 { color: #483D8B; }
+
+        /* ANIMATIONS */
+        .listening { animation: pulse 1.5s infinite; border-color: #ff4757 !important; }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(255, 71, 87, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0); }
+        }
+
+        /* RESPONSE AREA */
+        #response-area { 
+            margin-top: 20px; 
+            padding: 15px; 
+            background: rgba(255,255,255,0.9); 
+            border-radius: 15px; 
+            text-align: left; 
+            display: none; 
+            font-size: 15px; 
+            line-height: 1.4; 
+            color: #333;
+            border-left: 5px solid #333;
+        }
+
+        /* --- FOOTER --- */
+        .footer {
+            background: #fff;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #eee;
+            font-size: 12px;
+            color: #555;
+        }
+
+        .footer-logo { height: 30px; width: auto; margin-bottom: 5px; opacity: 0.8; }
+        .footer-firm { font-weight: bold; font-size: 14px; color: #333; margin-bottom: 2px; }
+        .developer-credit { font-size: 11px; color: #888; margin-bottom: 10px; font-style: italic; }
+        
+        .legal-text { 
+            font-size: 10px; 
+            color: #999; 
+            letter-spacing: 0.5px; 
+            line-height: 1.6;
+        }
+
+        /* SETTINGS & UTILS */
+        #status { color: #999; margin-top: 10px; font-size: 13px; font-style: italic; }
+        
+        /* Modal for Key Input */
+        #key-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 1000;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .modal-content {
+            background: white; padding: 25px; border-radius: 15px; width: 80%; max-width: 300px;
+            text-align: center;
+        }
+        #api-key-input { width: 90%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; }
+        .save-btn { background: #333; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
+        
+        .hidden { display: none !important; }
+        .reset-link { color: #ccc; font-size: 10px; text-decoration: none; display: inline-block; margin-top: 5px;}
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <img src="logo.png" alt="Logo" class="header-logo" onerror="this.style.display='none'"> 
+        <div class="header-text">
+            <h1>Atsintegrated</h1>
+            <p>Redefining Solution Delivery</p>
+        </div>
+    </header>
+
+    <main class="main-container">
+        
+        <div class="cards-wrapper">
+            <div class="card" id="mrunal-btn" onclick="activateAgent('Mrunal')">
+                <img src="https://cdn-icons-png.flaticon.com/512/616/616430.png" class="card-icon" alt="Kitten">
+                <div class="card-info">
+                    <h2>Mrunal</h2>
+                    <p>Class 4 • Magic Mode</p>
+                </div>
+            </div>
+
+            <div class="card" id="gargi-btn" onclick="activateAgent('Gargi')">
+                <img src="https://cdn-icons-png.flaticon.com/512/867/867908.png" class="card-icon" alt="Wand">
+                <div class="card-info">
+                    <h2>Gargi</h2>
+                    <p>Class 8 • Exam Mode</p>
+                </div>
+            </div>
+            
+            <div id="status">Tap a card to start... 🎙️</div>
+            <div id="response-area"></div>
+        </div>
+
+    </main>
+
+    <footer class="footer">
+        <img src="logo.png" alt="Logo" class="footer-logo" onerror="this.style.display='none'">
+        <div class="footer-firm">Atsintegrated</div>
+        <div class="developer-credit">Designed by Mandar Bahadarpurkar for Atsintegrated</div>
+        
+        <div class="legal-text">
+            atsintegrated.net<sup>&reg;</sup> Redefining Solution Delivery<sup>&copy;</sup> 2026 "All Rights Reserved"
+        </div>
+        
+        <a href="#" class="reset-link" onclick="resetKey()">⚙️ Reset Key</a>
+    </footer>
+
+    <div id="key-modal" class="hidden">
+        <div class="modal-content">
+            <h3>🔐 Setup</h3>
+            <p>Please enter your OpenAI API Key to activate the AI Tutor.</p>
+            <input type="password" id="api-key-input" placeholder="sk-...">
+            <button class="save-btn" onclick="saveKey()">Save & Start</button>
+        </div>
+    </div>
+
+    <script>
+        // --- SYLLABUS DATA (From PDFs) ---
+        const MRUNAL_SYLLABUS = {
+            [span_0](start_span)"turkish": "English: The Turkish Cap[span_0](end_span)",
+            [span_1](start_span)"cap": "English: The Turkish Cap[span_1](end_span)",
+            [span_2](start_span)"andaman": "English: Adventure in the Andamans[span_2](end_span)",
+            [span_3](start_span)"muttaji": "English: How old is Muttaji[span_3](end_span)",
+            [span_4](start_span)"mars": "English: A Holiday on Mars[span_4](end_span)",
+            [span_5](start_span)"treasure": "English: The Treasure Hunt[span_5](end_span)",
+            [span_6](start_span)"bhabhut": "Hindi: Sikke ka Bhabhut[span_6](end_span)",
+            [span_7](start_span)"ujiyara": "Hindi: Naya Ujiyara[span_7](end_span)"
+        };
+
+        const GARGI_SYLLABUS = {
+            // English
+            [span_8](start_span)"christmas": "English: The Best Christmas Present in the World (Cycle 1)[span_8](end_span)",
+            [span_9](start_span)"tsunami": "English: The Tsunami (Cycle 2)[span_9](end_span)",
+            [span_10](start_span)"ant": "Poem: The Ant and the Cricket[span_10](end_span)",
+            [span_11](start_span)"geography": "Poem: Geography Lesson[span_11](end_span)",
+            [span_12](start_span)"camel": "English: How the Camel got his hump[span_12](end_span)",
+            [span_13](start_span)"bepin": "English: Bepin Choudhury's Lapse of Memory[span_13](end_span)",
+            
+            // Math
+            [span_14](start_span)"rational": "Math: Rational Numbers (Cycle 1)[span_14](end_span)",
+            [span_15](start_span)"linear": "Math: Linear Equations in One Variable (Cycle 1)[span_15](end_span)",
+            [span_16](start_span)"quadrilateral": "Math: Understanding Quadrilaterals (Cycle 2)[span_16](end_span)",
+            [span_17](start_span)"data": "Math: Data Handling (Cycle 2)[span_17](end_span)",
+            
+            // Science
+            [span_18](start_span)"crop": "Science: Crop Production and Management (Cycle 1)[span_18](end_span)",
+            [span_19](start_span)"micro": "Science: Micro Organisms: Friend and Foe (Cycle 2)[span_19](end_span)",
+            [span_20](start_span)"coal": "Science: Coal and Petroleum (Cycle 1)[span_20](end_span)",
+            [span_21](start_span)"force": "Science: Force and Pressure (Cycle 1)[span_21](end_span)",
+            [span_22](start_span)"friction": "Science: Friction (Cycle 2)[span_22](end_span)",
+            [span_23](start_span)"combustion": "Science: Combustion and Flame (Half Yearly)[span_23](end_span)",
+            
+            // History/Civics
+            [span_24](start_span)"trade": "History: From Trade to Territory[span_24](end_span)",
+            [span_25](start_span)"rebel": "History: When People Rebel 1857[span_25](end_span)",
+            [span_26](start_span)"constitution": "Civics: The Indian Constitution[span_26](end_span)",
+            [span_27](start_span)"secularism": "Civics: Understanding Secularism[span_27](end_span)",
+            
+            // Computer
+            [span_28](start_span)"networking": "CompSci: Computer Networking (Cycle 2)[span_28](end_span)",
+            [span_29](start_span)"html": "CompSci: Images, Links and Frames in HTML (Cycle 4)[span_29](end_span)",
+            [span_30](start_span)"python": "CompSci: Looping in Python (Yearly)[span_30](end_span)"
+        };
+
+        // --- APP LOGIC ---
+        let currentStudent = "";
+        let apiKey = localStorage.getItem("openai_key");
+        
+        // Check for Key on Load
+        if(!apiKey) {
+            document.getElementById('key-modal').classList.remove('hidden');
+        }
+
+        function saveKey() {
+            const input = document.getElementById('api-key-input').value.trim();
+            if(input.startsWith("sk-")) {
+                localStorage.setItem("openai_key", input);
+                apiKey = input;
+                document.getElementById('key-modal').classList.add('hidden');
+                alert("Key Saved! You're ready.");
+            } else {
+                alert("Invalid Key. Must start with 'sk-'");
+            }
+        }
+
+        function resetKey() {
+            if(confirm("Reset API Key?")) {
+                localStorage.removeItem("openai_key");
+                location.reload();
+            }
+        }
+
+        // --- VOICE ENGINE ---
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'en-IN';
+        recognition.continuous = false;
+
+        recognition.onstart = () => {
+            document.getElementById('status').innerText = "Listening... 🎙️";
+            document.getElementById(currentStudent.toLowerCase() + '-btn').classList.add('listening');
+        };
+
+        recognition.onend = () => {
+            document.getElementById('status').innerText = "Processing... 🧠";
+            document.querySelectorAll('.card').forEach(c => c.classList.remove('listening'));
+        };
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            document.getElementById('status').innerText = `Heard: "${transcript}"`;
+            processQuery(transcript);
+        };
+        
+        recognition.onerror = (e) => {
+            if(e.error !== 'no-speech') alert("Microphone Error. Please use Chrome/Safari on HTTPS.");
+        };
+
+        function activateAgent(student) {
+            if(!apiKey) { 
+                document.getElementById('key-modal').classList.remove('hidden'); 
+                return; 
+            }
+            currentStudent = student;
+            speak(`Hi ${student}.`, () => recognition.start());
+        }
+
+        // --- AI ENGINE ---
+        async function processQuery(text) {
+            let context = "General Knowledge";
+            let activeSyllabus = (currentStudent === "Mrunal") ? MRUNAL_SYLLABUS : GARGI_SYLLABUS;
+
+            // Simple Syllabus Matching
+            for (let key in activeSyllabus) {
+                if (text.toLowerCase().includes(key)) {
+                    context = "Syllabus Match: " + activeSyllabus[key];
+                    break;
+                }
+            }
+
+            let prompt = "";
+            if (currentStudent === "Mrunal") {
+                prompt = `You are a playful tutor for a Class 4 student named Mrunal. 
+                User said: "${text}". Context: ${context}.
+                Keep it simple, enthusiastic, and use emojis. Max 2 sentences.`;
+            } else {
+                prompt = `You are an exam strategist for a Class 8 student named Gargi. 
+                User said: "${text}". Context: ${context}.
+                Provide definitions or formulae clearly. Bullet points preferred. Strict academic tone.`;
+            }
+
+            try {
+                const response = await fetch("https://api.openai.com/v1/chat/completions", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: "gpt-4o",
+                        messages: [{role: "system", content: prompt}, {role: "user", content: text}],
+                        max_tokens: 150
+                    })
+                });
+                
+                const data = await response.json();
+                if(data.error) throw new Error(data.error.message);
+                
+                const reply = data.choices[0].message.content;
+                
+                // Show & Speak
+                const display = document.getElementById('response-area');
+                display.style.display = 'block';
+                display.innerHTML = `<strong>${currentStudent}:</strong><br>${reply.replace(/\n/g, '<br>')}`;
+                speak(reply);
+                document.getElementById('status').innerText = "Tap card to ask again.";
+
+            } catch (error) {
+                alert("AI Error: " + error.message);
+            }
+        }
+
+        function speak(text, callback) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text.replace(/[*#]/g, ''));
+            utterance.lang = 'en-IN';
+            if(currentStudent === "Mrunal") { utterance.pitch = 1.2; }
+            if(callback) utterance.onend = callback;
+            window.speechSynthesis.speak(utterance);
+        }
+    </script>
+</body>
+</html>
